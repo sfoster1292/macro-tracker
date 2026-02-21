@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MACROS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
+<style>
+  :root {
+    --bg: #0f0f0d;
+    --surface: #1a1a16;
+    --surface2: #232320;
+    --border: #2e2e28;
+    --text: #e8e6df;
+    --muted: #706e65;
+    --protein: #f4845f;
+    --carbs: #f4c842;
+    --fat: #68c6a4;
+    --cal: #d4a5f5;
+    --accent: #f4845f;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+min-height: 100vh;
+padding: 0;
+}
+
+/* HEADER */
+header {
+border-bottom: 1px solid var(–border);
+padding: 20px 32px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+position: sticky;
+top: 0;
+background: var(–bg);
+z-index: 100;
+}
+
+.logo {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 2rem;
+letter-spacing: 4px;
+color: var(–text);
+}
+
+.logo span { color: var(–accent); }
+
+.date-nav {
+display: flex;
+align-items: center;
+gap: 16px;
+font-family: ‘DM Mono’, monospace;
+font-size: 0.8rem;
+color: var(–muted);
+}
+
+.date-nav button {
+background: none;
+border: 1px solid var(–border);
+color: var(–muted);
+width: 28px; height: 28px;
+border-radius: 4px;
+cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: all 0.15s;
+}
+
+.date-nav button:hover { border-color: var(–accent); color: var(–accent); }
+
+#current-date { color: var(–text); font-size: 0.85rem; min-width: 120px; text-align: center; }
+
+/* MAIN LAYOUT */
+main {
+max-width: 1100px;
+margin: 0 auto;
+padding: 32px 24px;
+display: grid;
+grid-template-columns: 1fr 340px;
+gap: 24px;
+}
+
+/* SUMMARY RING */
+.summary-panel {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 28px;
+display: flex;
+flex-direction: column;
+gap: 24px;
+}
+
+.summary-top {
+display: flex;
+gap: 24px;
+align-items: center;
+}
+
+.cal-ring {
+position: relative;
+width: 120px;
+height: 120px;
+flex-shrink: 0;
+}
+
+.cal-ring svg { transform: rotate(-90deg); }
+
+.cal-ring-center {
+position: absolute;
+inset: 0;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-align: center;
+}
+
+.cal-ring-center .num {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 1.8rem;
+line-height: 1;
+color: var(–cal);
+}
+
+.cal-ring-center .label {
+font-size: 0.6rem;
+color: var(–muted);
+letter-spacing: 1px;
+text-transform: uppercase;
+font-family: ‘DM Mono’, monospace;
+}
+
+.macro-bars {
+flex: 1;
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+.macro-row {
+display: flex;
+flex-direction: column;
+gap: 4px;
+}
+
+.macro-row-top {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.macro-name {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+letter-spacing: 1px;
+text-transform: uppercase;
+}
+
+.macro-val {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.75rem;
+color: var(–muted);
+}
+
+.macro-val span { color: var(–text); }
+
+.bar-track {
+height: 6px;
+background: var(–surface2);
+border-radius: 3px;
+overflow: hidden;
+}
+
+.bar-fill {
+height: 100%;
+border-radius: 3px;
+transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* GOALS EDITOR */
+.goals-row {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 8px;
+padding-top: 16px;
+border-top: 1px solid var(–border);
+}
+
+.goal-input-group {
+display: flex;
+flex-direction: column;
+gap: 4px;
+}
+
+.goal-input-group label {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.6rem;
+text-transform: uppercase;
+letter-spacing: 1px;
+color: var(–muted);
+}
+
+.goal-input-group input {
+background: var(–surface2);
+border: 1px solid var(–border);
+color: var(–text);
+border-radius: 6px;
+padding: 6px 8px;
+font-family: ‘DM Mono’, monospace;
+font-size: 0.8rem;
+width: 100%;
+transition: border-color 0.15s;
+}
+
+.goal-input-group input:focus {
+outline: none;
+border-color: var(–accent);
+}
+
+/* FOOD LOG */
+.log-panel {
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+
+.section-title {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 1.2rem;
+letter-spacing: 2px;
+color: var(–muted);
+}
+
+/* ADD FOOD FORM */
+.add-food-form {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 20px;
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+.form-row {
+display: grid;
+grid-template-columns: 1fr repeat(4, 70px);
+gap: 8px;
+}
+
+.form-row-2 {
+display: grid;
+grid-template-columns: 1fr auto;
+gap: 8px;
+}
+
+.form-field {
+display: flex;
+flex-direction: column;
+gap: 4px;
+}
+
+.form-field label {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.6rem;
+text-transform: uppercase;
+letter-spacing: 1px;
+color: var(–muted);
+}
+
+.form-field input, .form-field select {
+background: var(–surface2);
+border: 1px solid var(–border);
+color: var(–text);
+border-radius: 6px;
+padding: 8px 10px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 0.85rem;
+width: 100%;
+transition: border-color 0.15s;
+}
+
+.form-field input:focus, .form-field select:focus {
+outline: none;
+border-color: var(–accent);
+}
+
+.form-field select option { background: var(–surface2); }
+
+.btn-add {
+background: var(–accent);
+color: #0f0f0d;
+border: none;
+border-radius: 6px;
+padding: 10px 20px;
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 1rem;
+letter-spacing: 2px;
+cursor: pointer;
+transition: opacity 0.15s, transform 0.1s;
+align-self: flex-end;
+white-space: nowrap;
+}
+
+.btn-add:hover { opacity: 0.85; }
+.btn-add:active { transform: scale(0.97); }
+
+/* FOOD ENTRIES */
+.entries-list {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.meal-group {
+display: flex;
+flex-direction: column;
+gap: 6px;
+}
+
+.meal-header {
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 4px 0;
+}
+
+.meal-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.65rem;
+text-transform: uppercase;
+letter-spacing: 2px;
+color: var(–muted);
+}
+
+.meal-line {
+flex: 1;
+height: 1px;
+background: var(–border);
+}
+
+.meal-cal {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.65rem;
+color: var(–muted);
+}
+
+.entry {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 12px 16px;
+display: grid;
+grid-template-columns: 1fr auto;
+gap: 8px;
+align-items: center;
+animation: slideIn 0.2s ease;
+transition: border-color 0.15s;
+}
+
+.entry:hover { border-color: var(–surface2); }
+
+@keyframes slideIn {
+from { opacity: 0; transform: translateY(-4px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.entry-left { display: flex; flex-direction: column; gap: 4px; }
+
+.entry-name {
+font-size: 0.9rem;
+font-weight: 500;
+}
+
+.entry-macros {
+display: flex;
+gap: 12px;
+}
+
+.entry-macro {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+display: flex;
+align-items: center;
+gap: 3px;
+}
+
+.entry-macro .dot {
+width: 5px; height: 5px;
+border-radius: 50%;
+}
+
+.entry-right {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.entry-cal {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 1.2rem;
+color: var(–cal);
+}
+
+.entry-cal span {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.6rem;
+color: var(–muted);
+display: block;
+text-align: center;
+margin-top: -4px;
+}
+
+.btn-delete {
+background: none;
+border: 1px solid transparent;
+color: var(–muted);
+cursor: pointer;
+width: 28px; height: 28px;
+border-radius: 4px;
+display: flex; align-items: center; justify-content: center;
+font-size: 1rem;
+transition: all 0.15s;
+}
+
+.btn-delete:hover { border-color: #e05555; color: #e05555; }
+
+/* SIDEBAR */
+.sidebar {
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+
+.quick-add-panel {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 20px;
+}
+
+.quick-add-panel h3 {
+font-family: ‘Bebas Neue’, sans-serif;
+letter-spacing: 2px;
+font-size: 1rem;
+color: var(–muted);
+margin-bottom: 12px;
+}
+
+.quick-items {
+display: flex;
+flex-direction: column;
+gap: 6px;
+}
+
+.quick-item {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 8px 10px;
+background: var(–surface2);
+border-radius: 6px;
+cursor: pointer;
+border: 1px solid transparent;
+transition: all 0.15s;
+}
+
+.quick-item:hover { border-color: var(–border); }
+
+.quick-item-name { font-size: 0.8rem; }
+.quick-item-cal {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+color: var(–muted);
+}
+
+.btn-quick-add {
+background: none;
+border: 1px solid var(–border);
+color: var(–muted);
+border-radius: 4px;
+width: 22px; height: 22px;
+font-size: 0.9rem;
+cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: all 0.15s;
+}
+
+.btn-quick-add:hover { border-color: var(–accent); color: var(–accent); }
+
+/* WATER TRACKER */
+.water-panel {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 20px;
+}
+
+.water-panel h3 {
+font-family: ‘Bebas Neue’, sans-serif;
+letter-spacing: 2px;
+font-size: 1rem;
+color: var(–muted);
+margin-bottom: 14px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.water-count {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.8rem;
+color: var(–text);
+}
+
+.water-cups {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 8px;
+}
+
+.cup {
+aspect-ratio: 1;
+border-radius: 8px;
+border: 1px solid var(–border);
+background: var(–surface2);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.2rem;
+transition: all 0.2s;
+position: relative;
+overflow: hidden;
+}
+
+.cup.filled {
+border-color: #5ba8d4;
+background: rgba(91, 168, 212, 0.15);
+}
+
+.cup:hover { transform: scale(1.05); }
+
+/* EMPTY STATE */
+.empty-state {
+text-align: center;
+padding: 40px;
+color: var(–muted);
+font-family: ‘DM Mono’, monospace;
+font-size: 0.8rem;
+}
+
+.empty-state .icon { font-size: 2rem; margin-bottom: 8px; }
+
+/* HISTORY MINI */
+.history-panel {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 20px;
+}
+
+.history-panel h3 {
+font-family: ‘Bebas Neue’, sans-serif;
+letter-spacing: 2px;
+font-size: 1rem;
+color: var(–muted);
+margin-bottom: 12px;
+}
+
+.history-bars {
+display: flex;
+gap: 4px;
+align-items: flex-end;
+height: 60px;
+}
+
+.h-bar-wrap {
+flex: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 4px;
+height: 100%;
+justify-content: flex-end;
+}
+
+.h-bar {
+width: 100%;
+border-radius: 3px 3px 0 0;
+min-height: 2px;
+transition: height 0.4s ease;
+cursor: pointer;
+}
+
+.h-bar-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.55rem;
+color: var(–muted);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+main {
+grid-template-columns: 1fr;
+}
+.form-row {
+grid-template-columns: 1fr 1fr;
+}
+}
+
+/* SCAN BUTTON */
+.btn-scan {
+background: none;
+border: 1px solid var(–border);
+color: var(–muted);
+border-radius: 6px;
+padding: 8px 14px;
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+letter-spacing: 1px;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 6px;
+transition: all 0.15s;
+white-space: nowrap;
+}
+
+.btn-scan:hover { border-color: var(–accent); color: var(–accent); }
+
+.btn-scan svg { width: 14px; height: 14px; }
+
+/* SCANNER MODAL */
+.scanner-overlay {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.85);
+z-index: 1000;
+align-items: center;
+justify-content: center;
+backdrop-filter: blur(4px);
+}
+
+.scanner-overlay.active { display: flex; }
+
+.scanner-modal {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 16px;
+width: 90%;
+max-width: 480px;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+}
+
+.scanner-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 16px 20px;
+border-bottom: 1px solid var(–border);
+}
+
+.scanner-header h2 {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 1.2rem;
+letter-spacing: 3px;
+}
+
+.btn-close-scanner {
+background: none;
+border: 1px solid var(–border);
+color: var(–muted);
+width: 30px; height: 30px;
+border-radius: 6px;
+cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+font-size: 1rem;
+transition: all 0.15s;
+}
+
+.btn-close-scanner:hover { border-color: #e05555; color: #e05555; }
+
+.scanner-viewport {
+position: relative;
+width: 100%;
+aspect-ratio: 4/3;
+background: #000;
+overflow: hidden;
+}
+
+#scanner-video {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+
+.scanner-frame {
+position: absolute;
+inset: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+pointer-events: none;
+}
+
+.scanner-box {
+width: 65%;
+aspect-ratio: 3/1.2;
+border: 2px solid var(–accent);
+border-radius: 8px;
+box-shadow: 0 0 0 9999px rgba(0,0,0,0.45);
+position: relative;
+}
+
+.scanner-line {
+position: absolute;
+left: 4px; right: 4px;
+height: 2px;
+background: var(–accent);
+top: 50%;
+box-shadow: 0 0 8px var(–accent);
+animation: scanLine 2s ease-in-out infinite;
+}
+
+@keyframes scanLine {
+0%, 100% { top: 10%; }
+50% { top: 90%; }
+}
+
+.scanner-status {
+padding: 14px 20px;
+font-family: ‘DM Mono’, monospace;
+font-size: 0.75rem;
+color: var(–muted);
+text-align: center;
+min-height: 48px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+
+.scanner-status.error { color: #e05555; }
+.scanner-status.success { color: var(–fat); }
+.scanner-status.loading { color: var(–cal); }
+
+.spinner {
+width: 14px; height: 14px;
+border: 2px solid var(–border);
+border-top-color: var(–cal);
+border-radius: 50%;
+animation: spin 0.7s linear infinite;
+flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* PRODUCT PREVIEW */
+.product-preview {
+display: none;
+flex-direction: column;
+gap: 0;
+}
+
+.product-preview.active { display: flex; }
+
+.product-info {
+padding: 16px 20px;
+border-top: 1px solid var(–border);
+}
+
+.product-name-display {
+font-size: 1rem;
+font-weight: 500;
+margin-bottom: 4px;
+}
+
+.product-brand {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+color: var(–muted);
+margin-bottom: 12px;
+}
+
+.product-macro-chips {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+margin-bottom: 14px;
+}
+
+.macro-chip {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+padding: 4px 10px;
+border-radius: 20px;
+border: 1px solid;
+}
+
+.serving-row {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 14px;
+}
+
+.serving-row label {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+color: var(–muted);
+text-transform: uppercase;
+letter-spacing: 1px;
+white-space: nowrap;
+}
+
+.serving-row input {
+background: var(–surface2);
+border: 1px solid var(–border);
+color: var(–text);
+border-radius: 6px;
+padding: 6px 10px;
+font-family: ‘DM Mono’, monospace;
+font-size: 0.85rem;
+width: 80px;
+text-align: center;
+}
+
+.serving-row input:focus { outline: none; border-color: var(–accent); }
+
+.serving-unit {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+color: var(–muted);
+}
+
+.scaled-macros {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.75rem;
+color: var(–text);
+background: var(–surface2);
+border-radius: 6px;
+padding: 8px 12px;
+display: flex;
+gap: 16px;
+margin-bottom: 14px;
+}
+
+.product-actions {
+display: flex;
+gap: 8px;
+}
+
+.btn-confirm-scan {
+flex: 1;
+background: var(–accent);
+color: #0f0f0d;
+border: none;
+border-radius: 6px;
+padding: 10px;
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 1rem;
+letter-spacing: 2px;
+cursor: pointer;
+transition: opacity 0.15s;
+}
+
+.btn-confirm-scan:hover { opacity: 0.85; }
+
+.btn-scan-again {
+background: none;
+border: 1px solid var(–border);
+color: var(–muted);
+border-radius: 6px;
+padding: 10px 16px;
+font-family: ‘DM Mono’, monospace;
+font-size: 0.75rem;
+cursor: pointer;
+transition: all 0.15s;
+}
+
+.btn-scan-again:hover { border-color: var(–accent); color: var(–accent); }
+
+/* MANUAL BARCODE INPUT */
+.manual-barcode {
+padding: 12px 20px;
+border-top: 1px solid var(–border);
+display: flex;
+gap: 8px;
+align-items: center;
+}
+
+.manual-barcode input {
+flex: 1;
+background: var(–surface2);
+border: 1px solid var(–border);
+color: var(–text);
+border-radius: 6px;
+padding: 7px 10px;
+font-family: ‘DM Mono’, monospace;
+font-size: 0.8rem;
+}
+
+.manual-barcode input:focus { outline: none; border-color: var(–accent); }
+
+.btn-manual-lookup {
+background: none;
+border: 1px solid var(–border);
+color: var(–muted);
+border-radius: 6px;
+padding: 7px 12px;
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem;
+cursor: pointer;
+transition: all 0.15s;
+white-space: nowrap;
+}
+
+.btn-manual-lookup:hover { border-color: var(–accent); color: var(–accent); }
+
+/* TOAST */
+.toast {
+position: fixed;
+bottom: 24px;
+right: 24px;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 12px 18px;
+font-size: 0.8rem;
+font-family: ‘DM Mono’, monospace;
+color: var(–text);
+z-index: 999;
+animation: toastIn 0.2s ease, toastOut 0.2s ease 2s forwards;
+}
+
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="logo">MAC<span>R</span>OS</div>
+  <div class="date-nav">
+    <button onclick="changeDate(-1)">&#8592;</button>
+    <div id="current-date"></div>
+    <button onclick="changeDate(1)">&#8594;</button>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT COLUMN -->
+  <div class="log-panel">
+
+```
+<!-- SUMMARY -->
+<div class="summary-panel">
+  <div class="summary-top">
+    <div class="cal-ring">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="#2e2e28" stroke-width="10"/>
+        <circle id="cal-arc" cx="60" cy="60" r="50" fill="none" stroke="#d4a5f5" stroke-width="10"
+          stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"/>
+      </svg>
+      <div class="cal-ring-center">
+        <div class="num" id="summary-cal">0</div>
+        <div class="label">kcal</div>
+      </div>
+    </div>
+
+    <div class="macro-bars">
+      <div class="macro-row">
+        <div class="macro-row-top">
+          <span class="macro-name" style="color:var(--protein)">Protein</span>
+          <span class="macro-val"><span id="s-protein">0</span>g / <span id="g-protein">150</span>g</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="bar-protein" style="background:var(--protein);width:0%"></div></div>
+      </div>
+      <div class="macro-row">
+        <div class="macro-row-top">
+          <span class="macro-name" style="color:var(--carbs)">Carbs</span>
+          <span class="macro-val"><span id="s-carbs">0</span>g / <span id="g-carbs">200</span>g</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="bar-carbs" style="background:var(--carbs);width:0%"></div></div>
+      </div>
+      <div class="macro-row">
+        <div class="macro-row-top">
+          <span class="macro-name" style="color:var(--fat)">Fat</span>
+          <span class="macro-val"><span id="s-fat">0</span>g / <span id="g-fat">65</span>g</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="bar-fat" style="background:var(--fat);width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="goals-row">
+    <div class="goal-input-group">
+      <label>Cal Goal</label>
+      <input type="number" id="goal-cal" value="2000" onchange="saveGoals()">
+    </div>
+    <div class="goal-input-group">
+      <label>Protein (g)</label>
+      <input type="number" id="goal-protein" value="150" onchange="saveGoals()">
+    </div>
+    <div class="goal-input-group">
+      <label>Carbs (g)</label>
+      <input type="number" id="goal-carbs" value="200" onchange="saveGoals()">
+    </div>
+    <div class="goal-input-group">
+      <label>Fat (g)</label>
+      <input type="number" id="goal-fat" value="65" onchange="saveGoals()">
+    </div>
+  </div>
+</div>
+
+<!-- ADD FOOD -->
+<div class="section-title">Log Food</div>
+<div class="add-food-form">
+  <div class="form-row">
+    <div class="form-field">
+      <label>Food Name</label>
+      <input type="text" id="f-name" placeholder="e.g. Chicken breast" list="food-suggestions">
+      <datalist id="food-suggestions"></datalist>
+    </div>
+    <div class="form-field">
+      <label>Cal</label>
+      <input type="number" id="f-cal" placeholder="0" min="0">
+    </div>
+    <div class="form-field">
+      <label>Protein</label>
+      <input type="number" id="f-protein" placeholder="0" min="0">
+    </div>
+    <div class="form-field">
+      <label>Carbs</label>
+      <input type="number" id="f-carbs" placeholder="0" min="0">
+    </div>
+    <div class="form-field">
+      <label>Fat</label>
+      <input type="number" id="f-fat" placeholder="0" min="0">
+    </div>
+  </div>
+  <div class="form-row-2">
+    <div class="form-field">
+      <label>Meal</label>
+      <select id="f-meal">
+        <option>Breakfast</option>
+        <option>Lunch</option>
+        <option>Dinner</option>
+        <option>Snack</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;align-items:flex-end">
+      <button class="btn-scan" onclick="openScanner()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/>
+          <line x1="7" y1="12" x2="17" y2="12"/>
+        </svg>
+        SCAN
+      </button>
+      <button class="btn-add" onclick="addEntry()">+ ADD</button>
+    </div>
+  </div>
+</div>
+
+<!-- ENTRIES -->
+<div class="section-title">Today's Log</div>
+<div class="entries-list" id="entries-list">
+  <div class="empty-state">
+    <div class="icon">🥗</div>
+    No entries yet. Add your first meal above.
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+
+  <div class="sidebar">
+
+```
+<!-- QUICK ADD -->
+<div class="quick-add-panel">
+  <h3>Quick Add</h3>
+  <div class="quick-items" id="quick-items"></div>
+</div>
+
+<!-- WATER -->
+<div class="water-panel">
+  <h3>
+    Hydration
+    <span class="water-count"><span id="water-count">0</span> / 8 cups</span>
+  </h3>
+  <div class="water-cups" id="water-cups"></div>
+</div>
+
+<!-- HISTORY -->
+<div class="history-panel">
+  <h3>7-Day Calories</h3>
+  <div class="history-bars" id="history-bars"></div>
+</div>
+```
+
+  </div>
+</main>
+
+<!-- BARCODE SCANNER MODAL -->
+
+<div class="scanner-overlay" id="scanner-overlay">
+  <div class="scanner-modal">
+
+```
+<div class="scanner-header">
+  <h2>Scan Barcode</h2>
+  <button class="btn-close-scanner" onclick="closeScanner()">✕</button>
+</div>
+
+<div id="scanner-camera-section">
+  <div class="scanner-viewport">
+    <video id="scanner-video" autoplay muted playsinline></video>
+    <div class="scanner-frame">
+      <div class="scanner-box">
+        <div class="scanner-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scanner-status" id="scanner-status">
+    Point camera at a product barcode
+  </div>
+
+  <div class="manual-barcode">
+    <input type="text" id="manual-barcode-input" placeholder="Or type barcode number..." inputmode="numeric">
+    <button class="btn-manual-lookup" onclick="lookupManual()">LOOK UP</button>
+  </div>
+</div>
+
+<div class="product-preview" id="product-preview">
+  <div class="product-info">
+    <div class="product-name-display" id="preview-name"></div>
+    <div class="product-brand" id="preview-brand"></div>
+    <div class="product-macro-chips" id="preview-chips"></div>
+    <div class="serving-row">
+      <label>Servings</label>
+      <input type="number" id="serving-qty" value="1" min="0.1" step="0.1" oninput="updateScaledMacros()">
+      <span class="serving-unit" id="serving-unit-label">× 1 serving</span>
+    </div>
+    <div class="scaled-macros" id="scaled-macros"></div>
+    <div class="product-actions">
+      <button class="btn-confirm-scan" onclick="confirmScannedProduct()">ADD TO LOG</button>
+      <button class="btn-scan-again" onclick="resetScanner()">↩ Scan Again</button>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+// ─── BARCODE SCANNER ─────────────────────────────────────────────────────────
+
+let codeReader = null;
+let scannerStream = null;
+let scannedProductData = null;
+let perServingData = null;
+
+async function openScanner() {
+  document.getElementById('scanner-overlay').classList.add('active');
+  setStatus('Starting camera...', 'loading');
+  await startCamera();
+}
+
+function closeScanner() {
+  document.getElementById('scanner-overlay').classList.remove('active');
+  stopCamera();
+  resetScanner();
+}
+
+async function startCamera() {
+  try {
+    scannerStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 } }
+    });
+    const video = document.getElementById('scanner-video');
+    video.srcObject = scannerStream;
+    await video.play();
+    setStatus('Point camera at a product barcode', '');
+    startDecoding();
+  } catch (err) {
+    setStatus('Camera access denied. Use manual barcode entry below.', 'error');
+  }
+}
+
+function stopCamera() {
+  if (scannerStream) {
+    scannerStream.getTracks().forEach(t => t.stop());
+    scannerStream = null;
+  }
+  if (codeReader) {
+    try { codeReader.reset(); } catch(e) {}
+    codeReader = null;
+  }
+}
+
+function startDecoding() {
+  const video = document.getElementById('scanner-video');
+
+  // Try ZXing first (loaded via CDN)
+  const ZXingLib = window.ZXingLibrary || window.ZXing;
+  if (ZXingLib) {
+    try {
+      codeReader = new ZXingLib.BrowserMultiFormatReader();
+      codeReader.decodeFromVideoElement(video, (result, err) => {
+        if (result) {
+          stopCamera();
+          handleBarcode(result.getText());
+        }
+      });
+      return;
+    } catch(e) {}
+  }
+
+  // Fallback: native BarcodeDetector API (Chrome/Edge)
+  if ('BarcodeDetector' in window) {
+    const detector = new BarcodeDetector({
+      formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','qr_code']
+    });
+    let detecting = true;
+    const detect = async () => {
+      if (!detecting || !scannerStream) return;
+      try {
+        const barcodes = await detector.detect(video);
+        if (barcodes.length > 0) {
+          detecting = false;
+          stopCamera();
+          handleBarcode(barcodes[0].rawValue);
+          return;
+        }
+      } catch(e) {}
+      if (detecting) requestAnimationFrame(detect);
+    };
+    codeReader = { reset: () => { detecting = false; } };
+    requestAnimationFrame(detect);
+    return;
+  }
+
+  setStatus('Auto-scan not supported in this browser. Enter barcode manually below.', 'error');
+}
+
+async function handleBarcode(barcode) {
+  const statusEl = document.getElementById('scanner-status');
+  statusEl.innerHTML = `<div class="spinner"></div> Looking up ${barcode}...`;
+  statusEl.className = 'scanner-status loading';
+  await lookupBarcode(barcode);
+}
+
+async function lookupManual() {
+  const val = document.getElementById('manual-barcode-input').value.trim();
+  if (!val) return;
+  stopCamera();
+  handleBarcode(val);
+}
+
+async function lookupBarcode(barcode) {
+  try {
+    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    const data = await res.json();
+
+    if (data.status === 0 || !data.product) {
+      setStatus(`Product not found for barcode "${barcode}". Try manual entry below.`, 'error');
+      return;
+    }
+
+    const p = data.product;
+    const n = p.nutriments || {};
+
+    const cal100 = Math.round(
+      n['energy-kcal_100g'] ||
+      n['energy-kcal'] ||
+      (n['energy_100g'] ? n['energy_100g'] / 4.184 : 0)
+    );
+
+    const per100 = {
+      cal: cal100,
+      protein: parseFloat((n['proteins_100g'] || 0).toFixed(1)),
+      carbs: parseFloat((n['carbohydrates_100g'] || 0).toFixed(1)),
+      fat: parseFloat((n['fat_100g'] || 0).toFixed(1)),
+    };
+
+    const servingSize = p.serving_size || '100g';
+    const servingMatch = servingSize.match(/([\d.]+)\s*g/i);
+    const servingGrams = servingMatch ? parseFloat(servingMatch[1]) : 100;
+
+    perServingData = {
+      name: (p.product_name || p.product_name_en || 'Unknown Product').trim(),
+      brand: (p.brands || '').trim(),
+      cal: Math.round(per100.cal * servingGrams / 100),
+      protein: parseFloat((per100.protein * servingGrams / 100).toFixed(1)),
+      carbs: parseFloat((per100.carbs * servingGrams / 100).toFixed(1)),
+      fat: parseFloat((per100.fat * servingGrams / 100).toFixed(1)),
+      servingSize,
+      servingGrams,
+    };
+
+    showProductPreview(perServingData);
+
+  } catch(err) {
+    setStatus('Network error. Check your connection and try again.', 'error');
+  }
+}
+
+function showProductPreview(product) {
+  document.getElementById('scanner-camera-section').style.display = 'none';
+  const preview = document.getElementById('product-preview');
+  preview.classList.add('active');
+
+  document.getElementById('preview-name').textContent = product.name;
+  document.getElementById('preview-brand').textContent = product.brand;
+  document.getElementById('serving-unit-label').textContent = `× ${product.servingSize}`;
+  document.getElementById('serving-qty').value = 1;
+
+  document.getElementById('preview-chips').innerHTML = `
+    <div class="macro-chip" style="color:var(--cal);border-color:rgba(212,165,245,0.3)">${product.cal} kcal</div>
+    <div class="macro-chip" style="color:var(--protein);border-color:rgba(244,132,95,0.3)">${product.protein}g protein</div>
+    <div class="macro-chip" style="color:var(--carbs);border-color:rgba(244,200,66,0.3)">${product.carbs}g carbs</div>
+    <div class="macro-chip" style="color:var(--fat);border-color:rgba(104,198,164,0.3)">${product.fat}g fat</div>
+  `;
+
+  updateScaledMacros();
+}
+
+function updateScaledMacros() {
+  if (!perServingData) return;
+  const qty = parseFloat(document.getElementById('serving-qty').value) || 1;
+  const cal = Math.round(perServingData.cal * qty);
+  const protein = parseFloat((perServingData.protein * qty).toFixed(1));
+  const carbs = parseFloat((perServingData.carbs * qty).toFixed(1));
+  const fat = parseFloat((perServingData.fat * qty).toFixed(1));
+
+  document.getElementById('scaled-macros').innerHTML = `
+    <span style="color:var(--cal)">${cal} kcal</span>
+    <span style="color:var(--protein)">${protein}g P</span>
+    <span style="color:var(--carbs)">${carbs}g C</span>
+    <span style="color:var(--fat)">${fat}g F</span>
+  `;
+
+  scannedProductData = { cal, protein, carbs, fat, name: perServingData.name };
+}
+
+function confirmScannedProduct() {
+  if (!scannedProductData) return;
+  document.getElementById('f-name').value = scannedProductData.name;
+  document.getElementById('f-cal').value = scannedProductData.cal;
+  document.getElementById('f-protein').value = scannedProductData.protein;
+  document.getElementById('f-carbs').value = scannedProductData.carbs;
+  document.getElementById('f-fat').value = scannedProductData.fat;
+  closeScanner();
+  showToast(`${scannedProductData.name} loaded ✓`);
+}
+
+function resetScanner() {
+  document.getElementById('scanner-camera-section').style.display = '';
+  document.getElementById('product-preview').classList.remove('active');
+  document.getElementById('manual-barcode-input').value = '';
+  scannedProductData = null;
+  perServingData = null;
+  setStatus('Point camera at a product barcode', '');
+  if (document.getElementById('scanner-overlay').classList.contains('active')) {
+    startCamera();
+  }
+}
+
+function setStatus(msg, type) {
+  const el = document.getElementById('scanner-status');
+  el.textContent = msg;
+  el.className = 'scanner-status' + (type ? ' ' + type : '');
+}
+
+document.getElementById('scanner-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeScanner();
+});
+
+document.getElementById('manual-barcode-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') lookupManual();
+  e.stopPropagation();
+});
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+
+let currentDate = todayKey();
+let state = loadState();
+
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem('macros_v2')) || {}; } catch { return {}; }
+}
+
+function saveState() {
+  localStorage.setItem('macros_v2', JSON.stringify(state));
+}
+
+function getDayData(key) {
+  if (!state[key]) state[key] = { entries: [], water: 0 };
+  return state[key];
+}
+
+function getGoals() {
+  return JSON.parse(localStorage.getItem('macros_goals') || '{"cal":2000,"protein":150,"carbs":200,"fat":65}');
+}
+
+function saveGoals() {
+  const goals = {
+    cal: +document.getElementById('goal-cal').value,
+    protein: +document.getElementById('goal-protein').value,
+    carbs: +document.getElementById('goal-carbs').value,
+    fat: +document.getElementById('goal-fat').value,
+  };
+  localStorage.setItem('macros_goals', JSON.stringify(goals));
+  updateGoalLabels(goals);
+  updateSummary();
+}
+
+// ─── DATE NAV ────────────────────────────────────────────────────────────────
+
+function changeDate(dir) {
+  const d = new Date(currentDate);
+  d.setDate(d.getDate() + dir);
+  currentDate = d.toISOString().slice(0, 10);
+  renderAll();
+}
+
+function formatDateDisplay(key) {
+  const d = new Date(key + 'T00:00:00');
+  const today = todayKey();
+  if (key === today) return 'TODAY';
+  const yest = new Date(); yest.setDate(yest.getDate() - 1);
+  if (key === yest.toISOString().slice(0, 10)) return 'YESTERDAY';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+}
+
+// ─── ADD / DELETE ────────────────────────────────────────────────────────────
+
+function addEntry() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { shake('f-name'); return; }
+
+  const entry = {
+    id: Date.now(),
+    name,
+    cal: +document.getElementById('f-cal').value || 0,
+    protein: +document.getElementById('f-protein').value || 0,
+    carbs: +document.getElementById('f-carbs').value || 0,
+    fat: +document.getElementById('f-fat').value || 0,
+    meal: document.getElementById('f-meal').value,
+  };
+
+  getDayData(currentDate).entries.push(entry);
+  saveState();
+  saveToQuickAdd(entry);
+  clearForm();
+  renderAll();
+  showToast(`${name} added ✓`);
+}
+
+function deleteEntry(id) {
+  const day = getDayData(currentDate);
+  day.entries = day.entries.filter(e => e.id !== id);
+  saveState();
+  renderAll();
+}
+
+function clearForm() {
+  ['f-name','f-cal','f-protein','f-carbs','f-fat'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+function shake(id) {
+  const el = document.getElementById(id);
+  el.style.borderColor = '#e05555';
+  el.focus();
+  setTimeout(() => el.style.borderColor = '', 800);
+}
+
+// ─── QUICK ADD ───────────────────────────────────────────────────────────────
+
+function saveToQuickAdd(entry) {
+  let qa = JSON.parse(localStorage.getItem('macros_quick') || '[]');
+  qa = qa.filter(q => q.name !== entry.name);
+  qa.unshift({ name: entry.name, cal: entry.cal, protein: entry.protein, carbs: entry.carbs, fat: entry.fat });
+  qa = qa.slice(0, 8);
+  localStorage.setItem('macros_quick', JSON.stringify(qa));
+  updateSuggestions(qa);
+}
+
+function loadQuickAdd(entry) {
+  document.getElementById('f-name').value = entry.name;
+  document.getElementById('f-cal').value = entry.cal;
+  document.getElementById('f-protein').value = entry.protein;
+  document.getElementById('f-carbs').value = entry.carbs;
+  document.getElementById('f-fat').value = entry.fat;
+}
+
+// ─── WATER ───────────────────────────────────────────────────────────────────
+
+function toggleWater(idx) {
+  const day = getDayData(currentDate);
+  day.water = idx < day.water ? idx : idx + 1;
+  saveState();
+  renderWater();
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+
+function renderAll() {
+  document.getElementById('current-date').textContent = formatDateDisplay(currentDate);
+  updateSummary();
+  renderEntries();
+  renderWater();
+  renderQuickAdd();
+  renderHistory();
+}
+
+function updateGoalLabels(goals) {
+  document.getElementById('g-protein').textContent = goals.protein;
+  document.getElementById('g-carbs').textContent = goals.carbs;
+  document.getElementById('g-fat').textContent = goals.fat;
+}
+
+function updateSummary() {
+  const day = getDayData(currentDate);
+  const goals = getGoals();
+
+  const totals = day.entries.reduce((acc, e) => {
+    acc.cal += e.cal; acc.protein += e.protein;
+    acc.carbs += e.carbs; acc.fat += e.fat;
+    return acc;
+  }, { cal: 0, protein: 0, carbs: 0, fat: 0 });
+
+  document.getElementById('summary-cal').textContent = totals.cal;
+  document.getElementById('s-protein').textContent = totals.protein;
+  document.getElementById('s-carbs').textContent = totals.carbs;
+  document.getElementById('s-fat').textContent = totals.fat;
+
+  const pct = (v, g) => Math.min(100, g > 0 ? (v / g * 100) : 0);
+
+  document.getElementById('bar-protein').style.width = pct(totals.protein, goals.protein) + '%';
+  document.getElementById('bar-carbs').style.width = pct(totals.carbs, goals.carbs) + '%';
+  document.getElementById('bar-fat').style.width = pct(totals.fat, goals.fat) + '%';
+
+  // Ring
+  const calPct = Math.min(1, goals.cal > 0 ? totals.cal / goals.cal : 0);
+  const circumference = 2 * Math.PI * 50;
+  const offset = circumference * (1 - calPct);
+  document.getElementById('cal-arc').style.strokeDasharray = circumference;
+  document.getElementById('cal-arc').style.strokeDashoffset = offset;
+
+  updateGoalLabels(goals);
+}
+
+function renderEntries() {
+  const container = document.getElementById('entries-list');
+  const day = getDayData(currentDate);
+
+  if (day.entries.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">🥗</div>No entries yet. Add your first meal above.</div>`;
+    return;
+  }
+
+  const meals = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+  let html = '';
+
+  meals.forEach(meal => {
+    const items = day.entries.filter(e => e.meal === meal);
+    if (!items.length) return;
+
+    const mealCal = items.reduce((s, e) => s + e.cal, 0);
+    html += `<div class="meal-group">
+      <div class="meal-header">
+        <span class="meal-label">${meal}</span>
+        <div class="meal-line"></div>
+        <span class="meal-cal">${mealCal} kcal</span>
+      </div>`;
+
+    items.forEach(e => {
+      html += `<div class="entry">
+        <div class="entry-left">
+          <div class="entry-name">${e.name}</div>
+          <div class="entry-macros">
+            <div class="entry-macro"><div class="dot" style="background:var(--protein)"></div>${e.protein}g P</div>
+            <div class="entry-macro"><div class="dot" style="background:var(--carbs)"></div>${e.carbs}g C</div>
+            <div class="entry-macro"><div class="dot" style="background:var(--fat)"></div>${e.fat}g F</div>
+          </div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-cal">${e.cal}<span>kcal</span></div>
+          <button class="btn-delete" onclick="deleteEntry(${e.id})">✕</button>
+        </div>
+      </div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderWater() {
+  const day = getDayData(currentDate);
+  const cups = document.getElementById('water-cups');
+  let html = '';
+  for (let i = 0; i < 8; i++) {
+    html += `<div class="cup ${i < day.water ? 'filled' : ''}" onclick="toggleWater(${i})">
+      ${i < day.water ? '💧' : '○'}
+    </div>`;
+  }
+  cups.innerHTML = html;
+  document.getElementById('water-count').textContent = day.water;
+}
+
+function renderQuickAdd() {
+  const qa = JSON.parse(localStorage.getItem('macros_quick') || '[]');
+  const container = document.getElementById('quick-items');
+
+  if (!qa.length) {
+    container.innerHTML = `<div style="font-size:0.75rem;color:var(--muted);font-family:'DM Mono',monospace;padding:8px 0;">Foods you log will appear here</div>`;
+    return;
+  }
+
+  container.innerHTML = qa.slice(0, 6).map(q => `
+    <div class="quick-item" onclick='loadQuickAdd(${JSON.stringify(q)})'>
+      <span class="quick-item-name">${q.name}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="quick-item-cal">${q.cal} kcal</span>
+        <button class="btn-quick-add" onclick='event.stopPropagation(); loadQuickAdd(${JSON.stringify(q)})'>+</button>
+      </div>
+    </div>
+  `).join('');
+
+  updateSuggestions(qa);
+}
+
+function updateSuggestions(qa) {
+  const dl = document.getElementById('food-suggestions');
+  dl.innerHTML = qa.map(q => `<option value="${q.name}">`).join('');
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-bars');
+  const goals = getGoals();
+  const days = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const day = state[key];
+    const cal = day ? day.entries.reduce((s, e) => s + e.cal, 0) : 0;
+    const label = d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2).toUpperCase();
+    days.push({ key, cal, label });
+  }
+
+  const maxCal = Math.max(...days.map(d => d.cal), goals.cal, 1);
+
+  container.innerHTML = days.map(d => {
+    const h = Math.max(2, (d.cal / maxCal) * 52);
+    const isToday = d.key === todayKey();
+    const isCurrent = d.key === currentDate;
+    const color = isCurrent ? 'var(--accent)' : isToday ? 'var(--cal)' : '#3a3a35';
+    return `<div class="h-bar-wrap" title="${d.cal} kcal">
+      <div class="h-bar" style="height:${h}px;background:${color}" onclick="currentDate='${d.key}';renderAll()"></div>
+      <div class="h-bar-label">${d.label}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2300);
+}
+
+// ─── ENTER KEY ───────────────────────────────────────────────────────────────
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('f-name').value) addEntry();
+});
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+
+function init() {
+  const goals = getGoals();
+  document.getElementById('goal-cal').value = goals.cal;
+  document.getElementById('goal-protein').value = goals.protein;
+  document.getElementById('goal-carbs').value = goals.carbs;
+  document.getElementById('goal-fat').value = goals.fat;
+  renderAll();
+}
+
+init();
+</script>
+
+</body>
+</html>
